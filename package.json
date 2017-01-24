@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/drpaulbrewer/single-market-robot-simulator-log"
+    "url": "git+https://github.com/drpaulbrewer/simple-isomorphic-logger.git"
   },
   "author": "drpaulbrewer@eaftc.com",
   "license": "MIT",
