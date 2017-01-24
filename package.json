@@ -1,6 +1,6 @@
 {
   "name": "simple-isomorphic-logger",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Flexibly log data to an in-memory browser array or to stream with writeSync to a .csv file on nodeJS",
   "main": "build/index.js",
   "scripts": {
@@ -19,8 +19,7 @@
   },
   "author": "drpaulbrewer@eaftc.com",
   "license": "MIT",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-cli": "^6.10.1",
