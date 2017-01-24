@@ -3,10 +3,7 @@ simple-isomorphic-logger
 [![Build Status](https://travis-ci.org/DrPaulBrewer/simple-isomorphic-logger.svg?branch=master)](https://travis-ci.org/DrPaulBrewer/simple-isomorphic-logger)
 [![Coverage Status](https://coveralls.io/repos/github/DrPaulBrewer/simple-isomorphic-logger/badge.svg?branch=master)](https://coveralls.io/github/DrPaulBrewer/simple-isomorphic-logger?branch=master)
 
-
-A stand alone nodejs app or module for creating robot trading simulations in a single market with configurable supply and demand. 
-
-By default uses my implementation of Gode and Sunder's Zero Intelligence Robots, but you can use other robot types or also write and register your own robots.
+Flexibly log data to an in-memory browser array or to stream with writeSync to a .csv file on nodeJS
 
 ##Programmer's Documentation on ESDoc
 
