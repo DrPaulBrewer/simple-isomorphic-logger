@@ -79,3 +79,21 @@ describe('Log.write(undefined) to data array', function(){
         assert.ok(typeof(L.last)==='undefined');
     });
 });
+
+describe('new Log() to file', function(){
+
+    global.fs = require('fs');  // eslint-disable-line global-require
+    
+    it('should have an empty data array', function(){   
+        let L = new Log("/tmp/test1", true);
+        L.should.not.have.property('data');
+    });
+    it('should have .useFS true', function(){
+        let L = new Log("/tmp/test1",true);
+        assert.ok(L.useFS);
+    });
+    it('should have .fd defined', function(){
+        let L = new Log("/tmp/test1",true);
+        assert.ok(typeof(L.fd)==='number');
+    });
+});

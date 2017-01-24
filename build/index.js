@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -14,7 +16,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 /* eslint no-sync:"off" */
 
-/* globals fs */
+/* global fs */
 
 /**
  * Isomorphic javascript logger, logs data rows to memory for browser and test simulations, logs data rows to .csv disk files for node server-based simulations
@@ -31,9 +33,10 @@ var Log = function () {
      * Create Log with suggested file name in browser memory or on-disk in nodejs
      *
      * @param {string} fname Suggested file name
+     * @param {boolean} force true forces filesystem mode, false forces memory mode, undefined tests for 'fs' module
      */
 
-    function Log(fname) {
+    function Log(fname, force) {
         _classCallCheck(this, Log);
 
         /**
@@ -43,8 +46,13 @@ var Log = function () {
 
         this.useFS = false;
         try {
-            this.useFS = typeof fname === 'string' && fs && fs.openSync && fs.writeSync && !fs.should;
+            if (typeof force === 'undefined') {
+                this.useFS = typeof fname === 'string' && (typeof fs === 'undefined' ? 'undefined' : _typeof(fs)) === 'object' && typeof fs.openSync === 'function' && typeof fs.writeSync === 'function' && !fs.should;
+            } else {
+                this.useFS = force;
+            }
         } catch (e) {} // eslint-disable-line no-empty
+
         if (this.useFS) {
 
             /**

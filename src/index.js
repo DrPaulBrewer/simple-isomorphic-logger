@@ -4,7 +4,7 @@
 
 /* eslint no-sync:"off" */
 
-/* globals fs */
+/* global fs */
 
 /**
  * Isomorphic javascript logger, logs data rows to memory for browser and test simulations, logs data rows to .csv disk files for node server-based simulations
@@ -22,9 +22,10 @@ export default class Log {
      * Create Log with suggested file name in browser memory or on-disk in nodejs
      *
      * @param {string} fname Suggested file name
+     * @param {boolean} force true forces filesystem mode, false forces memory mode, undefined tests for 'fs' module
      */
 
-    constructor(fname){
+    constructor(fname, force){
 
         /**
          * if true, uses nodejs fs calls
@@ -32,15 +33,20 @@ export default class Log {
          */
         
         this.useFS = false;
-        try { 
-            this.useFS = ( (typeof(fname)==='string') &&
-                           (fs) &&
-                           (fs.openSync) &&
-                           (fs.writeSync) &&
-                           !(fs.should) );
+        try {
+            if (typeof(force)==='undefined'){
+                this.useFS = ( (typeof(fname)==='string') &&
+                               (typeof(fs)==='object') &&
+                               (typeof(fs.openSync)==='function') &&
+                               (typeof(fs.writeSync)==='function') &&
+                               !(fs.should) );
+            } else {
+                this.useFS = force;
+            }
         } catch(e){} // eslint-disable-line no-empty
+
         if (this.useFS){
-            
+                
             /**
              * log file descriptor from open call
              * @type {number} this.fd
