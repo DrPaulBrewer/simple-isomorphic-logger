@@ -97,3 +97,19 @@ describe('new Log() to file', function(){
         assert.ok(typeof(L.fd)==='number');
     });
 });
+
+describe('Log.write to file', function(){
+    global.fs = require('fs'); // eslint-disable-line global-require
+    let L = new Log("/tmp/test2", true);
+    L.setHeader(["a","b","c","d","e"]);
+    L.write([1,2,3,4,5]);
+    L.write([6,7,8,9,10]);
+    global.fs.closeSync(L.fd); // eslint-disable-line no-sync
+    it('/tmp/test2 should contain a,b,c,d,e\n1,2,3,4,5\n6,7,8,9,10\n ', function(){
+	const out = global.fs.readFileSync("/tmp/test2", {encoding: "utf-8"}); // eslint-disable-line no-sync
+	out.should.eql("a,b,c,d,e\n1,2,3,4,5\n6,7,8,9,10\n");
+    });
+    it('last should contain [6,7,8,9,10]', function(){
+	L.last.should.deepEqual([6,7,8,9,10]);
+    });
+});
