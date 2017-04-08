@@ -8,13 +8,17 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 // Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC                             
 // This is open source software. The MIT License applies to this software.                                  
 // see https://opensource.org/licenses/MIT or included License.md file
 
-/* eslint no-sync:"off" */
+/* eslint no-sync:"off", no-underscore-dangle:"off" */
 
 /* global fs */
 
@@ -60,6 +64,7 @@ var Log = function () {
              * @type {number} this.fd
              */
 
+            this.fname = fname;
             this.fd = fs.openSync(fname, 'w');
         } else {
 
@@ -73,12 +78,30 @@ var Log = function () {
     }
 
     /**
-     * writes data to Log and sets .last
-     * @param {Array|number|string} x data to write to Log's log file or memory
-     * @return {Object} returns Log object, chainable
+     * stringifies data for text file
+     * @param {Array|number|string} x data fo write to a string output
+     * @return {string} stringified x data
      */
 
     _createClass(Log, [{
+        key: 'stringify',
+        value: function stringify(x) {
+            if (Array.isArray(x)) {
+                return x.join(",") + "\n";
+            }
+            if (typeof x === 'number' || typeof x === 'string') {
+                return x + "\n";
+            }
+            return JSON.stringify(x) + "\n";
+        }
+
+        /**
+         * writes data to Log and sets .last
+         * @param {Array|number|string} x data to write to Log's log file or memory
+         * @return {Object} returns Log object, chainable
+         */
+
+    }, {
         key: 'write',
         value: function write(x) {
             if (x === undefined) return;
@@ -91,13 +114,7 @@ var Log = function () {
             this.last = x;
 
             if (this.useFS) {
-                if (Array.isArray(x)) {
-                    fs.appendFileSync(this.fd, x.join(",") + "\n");
-                } else if (typeof x === 'number' || typeof x === 'string') {
-                    fs.appendFileSync(this.fd, x + "\n");
-                } else {
-                    fs.appendFileSync(this.fd, JSON.stringify(x) + "\n");
-                }
+                fs.appendFileSync(this.fd, this.stringify(x));
             } else {
                 this.data.push(x);
             }
@@ -121,7 +138,6 @@ var Log = function () {
                  */
 
                 this.header = x;
-
                 this.write(x);
             }
             return this;
@@ -138,6 +154,79 @@ var Log = function () {
             if (this.header && this.header.length && this.last && this.last.length) {
                 return this.last[this.header.indexOf(k)];
             }
+        }
+
+        /**
+         * get string of all data in the log.  If useFS is true, simply read the file.  If useFS is false, assemble from data. 
+         *
+         * @return string representing all log data
+         *
+         */
+
+    }, {
+        key: 'toString',
+        value: function toString() {
+            if (this.useFS) {
+                return fs.readFileSync(this.fname, { encoding: 'utf8' });
+            }
+            var s = '';
+            var i = void 0,
+                l = void 0;
+            for (i = 0, l = this.data.length; i < l; ++i) {
+                s += this.stringify(this.data[i]);
+            }
+            return s;
+        }
+
+        /**
+         * get readable stream of string log data. This function requires a base class parameter Readable if using with in-memory data.
+         * @param {Object} Readable base class for constructing readable streams (required only if log useFS=false)
+         * @return {Object} readable stream of log data, in string form with newlines terminating records
+         */
+
+    }, {
+        key: 'createReadStream',
+        value: function createReadStream(Readable) {
+            if (this.useFS) {
+                fs.fsyncSync(this.fd);
+                return fs.createReadStream(this.fname, { encoding: 'utf8' });
+            }
+            if (!Readable) throw new Error("missing base class for Readable stream as first parameter");
+
+            var LogStream = function (_Readable) {
+                _inherits(LogStream, _Readable);
+
+                function LogStream(simlog, opt) {
+                    _classCallCheck(this, LogStream);
+
+                    var _this = _possibleConstructorReturn(this, (LogStream.__proto__ || Object.getPrototypeOf(LogStream)).call(this, opt));
+
+                    _this._log = simlog;
+                    _this._index = 0;
+                    return _this;
+                }
+
+                _createClass(LogStream, [{
+                    key: '_read',
+                    value: function _read() {
+                        var i = void 0,
+                            hungry = void 0;
+                        do {
+                            i = this._index++;
+                            if (i < this._log.data.length) {
+                                var str = this._log.stringify(this._log.data[i]);
+                                if (typeof str === 'string' && str.length > 0) hungry = this.push(str, 'utf8');
+                            } else {
+                                hungry = this.push(null);
+                            }
+                        } while (i < this._max && hungry);
+                    }
+                }]);
+
+                return LogStream;
+            }(Readable);
+
+            return new LogStream(this);
         }
     }]);
 
