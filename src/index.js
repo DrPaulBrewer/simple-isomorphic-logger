@@ -11,7 +11,7 @@
  */
 
 /**
- * Log stores tabular (array-of-array) data in JS memory on the browser, but streams it to disk using fs.writeSync() in nodejs server apps.
+ * Log stores tabular (array-of-array) data in JS memory on the browser, but streams it to disk using fs.appendFileSync() in nodejs server apps.
  * .last is used to cache the last log row As a kind of limited guarantee of history on both platforms
  */
 
@@ -38,7 +38,7 @@ export default class Log {
                 this.useFS = ( (typeof(fname)==='string') &&
                                (typeof(fs)==='object') &&
                                (typeof(fs.openSync)==='function') &&
-                               (typeof(fs.writeSync)==='function') &&
+                               (typeof(fs.appendFileSync)==='function') &&
                                !(fs.should) );
             } else {
                 this.useFS = force;
@@ -82,11 +82,11 @@ export default class Log {
 
         if (this.useFS){
             if (Array.isArray(x)){
-                fs.writeSync(this.fd, x.join(",")+"\n");
+                fs.appendFileSync(this.fd, x.join(",")+"\n");
             } else if ((typeof(x)==='number') || (typeof(x)==='string')){
-                fs.writeSync(this.fd, x+"\n");
+                fs.appendFileSync(this.fd, x+"\n");
             } else {
-                fs.writeSync(this.fd, JSON.stringify(x)+"\n");
+                fs.appendFileSync(this.fd, JSON.stringify(x)+"\n");
             }
         } else {
             this.data.push(x);
@@ -125,5 +125,7 @@ export default class Log {
             return this.last[this.header.indexOf(k)];
         }
     }
+
+    
 }
 

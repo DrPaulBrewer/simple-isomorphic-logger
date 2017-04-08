@@ -23,7 +23,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  */
 
 /**
- * Log stores tabular (array-of-array) data in JS memory on the browser, but streams it to disk using fs.writeSync() in nodejs server apps.
+ * Log stores tabular (array-of-array) data in JS memory on the browser, but streams it to disk using fs.appendFileSync() in nodejs server apps.
  * .last is used to cache the last log row As a kind of limited guarantee of history on both platforms
  */
 
@@ -47,7 +47,7 @@ var Log = function () {
         this.useFS = false;
         try {
             if (typeof force === 'undefined') {
-                this.useFS = typeof fname === 'string' && (typeof fs === 'undefined' ? 'undefined' : _typeof(fs)) === 'object' && typeof fs.openSync === 'function' && typeof fs.writeSync === 'function' && !fs.should;
+                this.useFS = typeof fname === 'string' && (typeof fs === 'undefined' ? 'undefined' : _typeof(fs)) === 'object' && typeof fs.openSync === 'function' && typeof fs.appendFileSync === 'function' && !fs.should;
             } else {
                 this.useFS = force;
             }
@@ -92,11 +92,11 @@ var Log = function () {
 
             if (this.useFS) {
                 if (Array.isArray(x)) {
-                    fs.writeSync(this.fd, x.join(",") + "\n");
+                    fs.appendFileSync(this.fd, x.join(",") + "\n");
                 } else if (typeof x === 'number' || typeof x === 'string') {
-                    fs.writeSync(this.fd, x + "\n");
+                    fs.appendFileSync(this.fd, x + "\n");
                 } else {
-                    fs.writeSync(this.fd, JSON.stringify(x) + "\n");
+                    fs.appendFileSync(this.fd, JSON.stringify(x) + "\n");
                 }
             } else {
                 this.data.push(x);
