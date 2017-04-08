@@ -179,6 +179,57 @@ var Log = function () {
         }
 
         /**
+         * restore Log from string.  inverse of toString(). 
+         *
+         * @param string to convert to complete Log
+         */
+
+    }, {
+        key: 'fromString',
+        value: function fromString(s) {
+            function rowFromLine(line) {
+                var row = line.split(",");
+                for (var i = 0, rl = row.length; i < rl; ++i) {
+                    var v = row[i];
+                    if (v && /^-?\d/.test(v)) {
+                        v = parseFloat(v);
+                        if (!isNaN(v)) row[i] = v;
+                    }
+                }
+                return row;
+            }
+            var first = s.substring(0, s.indexOf("\n"));
+            var start = 0;
+
+            if (this.data) {
+                if (this.data.length > 1) throw new Error("forbidden: attempting fromString() on populated Log -- denied -- would cause data erasure");
+                this.data.length = 0;
+            }
+
+            if (this.header) {
+                this.setHeader(first.split(","));
+                start = first.length + 1;
+            }
+
+            var l = s.length;
+
+            while (start < l) {
+                var match = s.indexOf("\n", start);
+                var line = match === -1 ? s.substring(start, s.length) : s.substring(start, match);
+                start += line.length + 1;
+                if (line.includes(",")) {
+                    this.write(rowFromLine(line));
+                } else if (line.startsWith('{')) {
+                    var obj = JSON.parse(line);
+                    this.write(obj);
+                } else {
+                    this.write(line);
+                }
+            }
+            return this;
+        }
+
+        /**
          * get readable stream of string log data. This function requires a base class parameter Readable if using with in-memory data.
          * @param {Object} Readable base class for constructing readable streams (required only if log useFS=false)
          * @return {Object} readable stream of log data, in string form with newlines terminating records

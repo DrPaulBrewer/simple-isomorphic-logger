@@ -114,6 +114,12 @@ describe('Log.write then read back -- in filesystem ', function(){
         const out = L.toString();
         out.should.eql("a,b,c,d,e\n1,2,3,4,5\n6,7,8,9,10\n");
     });
+    it('toString/fromString/toString should contain same', function(){
+        const out1 = L.toString();
+        const L2 = new Log("test", false).setHeader(["bullshit","headings","will","be","replaced"]).fromString(out1);
+        const out2 = L2.toString();
+        out2.should.eql("a,b,c,d,e\n1,2,3,4,5\n6,7,8,9,10\n");
+    });
     it('using createReadStream and stream concat contains same', function(done){
         (L
          .createReadStream(Readable)
@@ -145,6 +151,12 @@ describe('Log.write then read back -- in memory ', function(){
     it('toString() should contain expected output', function(){
         const out = L.toString();
         out.should.eql("a,b,c,d,e\n1,2,3,4,5\n6,7,8,9,10\n");
+    });
+    it('toString/fromString/toString should contain same', function(){
+        const out1 = L.toString();
+        const L2 = new Log("test", false).setHeader(["bullshit","headings","will","be","replaced"]).fromString(out1);
+        const out2 = L2.toString();
+        out2.should.eql("a,b,c,d,e\n1,2,3,4,5\n6,7,8,9,10\n");
     });
     it('using createReadStream and stream concat contains same', function(done){
         (L
