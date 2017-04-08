@@ -28,10 +28,14 @@ describe('new Log() to data array', function(){
 
 
 describe('Log.write([1,2,3,4,5]) to data array ', function(){
+
+    let L;
     
-    let L = new Log();
-    L.data.length.should.equal(0);
-    L.write([1,2,3,4,5]);
+    before(function(){
+	L = new Log();
+	L.data.length.should.equal(0);
+	L.write([1,2,3,4,5]);
+    });
 
     it('should add the array [1,2,3,4,5] to the data array', function(){
         L.data.length.should.equal(1);
@@ -58,16 +62,29 @@ describe('Log.write(23) to data array', function(){
     });
 });
 
-describe('Log.write({a:23}) to data array', function(){
-    
-    it('should add the object {a:23} to the data array', function(){
-        let L = new Log();
+describe('Log.write({a:23,b:9}) to data array', function(){
+
+    let L;
+
+    before(function(){
+	L = new Log();
         L.data.length.should.equal(0);
-        L.write({a:23});
-        L.last.should.deepEqual({a:23});
-        L.data.length.should.equal(1);
-        L.data.should.deepEqual([{a:23}]);
+        L.write({a:23,b:9});
     });
+
+    it('.last should be the object {a:23, b:9}', function(){
+	L.last.should.deepEqual({a:23,b:9});
+    });
+    
+    it('should add the object {a:23,b:9} to the data array', function(){
+        L.data.length.should.equal(1);
+        L.data.should.deepEqual([{a:23,b:9}]);
+    });
+
+    it('should have identical .data after toString/fromString', function(){
+	new Log().fromString(L.toString()).data.should.deepEqual(L.data);
+    });
+    
 });
 
 describe('Log.write(undefined) to data array', function(){

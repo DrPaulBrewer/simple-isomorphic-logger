@@ -217,14 +217,13 @@ var Log = function () {
                 var match = s.indexOf("\n", start);
                 var line = match === -1 ? s.substring(start, s.length) : s.substring(start, match);
                 start += line.length + 1;
-                if (line.includes(",")) {
-                    this.write(rowFromLine(line));
-                } else if (line.startsWith('{')) {
+                var fchar = line[0];
+                if (fchar === '{' || fchar === '"' || fchar === '[') {
                     var obj = JSON.parse(line);
                     this.write(obj);
-                } else {
-                    this.write(line);
-                }
+                } else if (line.includes(",")) {
+                    this.write(rowFromLine(line));
+                } else this.write(line);
             }
             return this;
         }

@@ -196,14 +196,14 @@ export default class Log {
             const match =  s.indexOf("\n", start);
             const line = (match===-1)? (s.substring(start,s.length)): (s.substring(start,match));
             start += (line.length+1);
-            if (line.includes(",")){
-                this.write(rowFromLine(line));
-            } else if (line.startsWith('{')){
+            const fchar = line[0];
+            if ((fchar==='{') || (fchar==='"') || (fchar==='[')) {
                 const obj = JSON.parse(line);
                 this.write(obj);
-            } else {
+            } else if (line.includes(",")){
+                this.write(rowFromLine(line));
+            } else
                 this.write(line);
-            }
         }
         return this;
     }
