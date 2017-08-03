@@ -17,7 +17,7 @@ will run the tests, if you have node 6 or later and mocha installed.  You can al
 
 ##Copyright 
 
-Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC
+Copyright 2016,2017- Paul Brewer, Economic and Financial Technology Consulting LLC
 
 ##License: 
 
