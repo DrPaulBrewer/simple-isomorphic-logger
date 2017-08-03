@@ -156,11 +156,18 @@ describe('Log.write then read back -- in filesystem ', function(){
  
 });
 
-describe('Log.write then read back -- in memory ', function(){
+describe('Log.write 1,2,3,4,5 and submit object with values 6,7,8,9,10 then read back -- in memory ', function(){
     let L = new Log("/tmp/test3", false);
     L.setHeader(["a","b","c","d","e"]);
     L.write([1,2,3,4,5]);
-    L.write([6,7,8,9,10]);
+    const obj = {
+	a: 6,
+	b: 7,
+	c: 8,
+	d: 9,
+	e: 10
+    };
+    L.submit(obj);
     it('/tmp/test3 shoud not exist', function(){
         const fs = require('fs'); // eslint-disable-line global-require
         assert.ok(fs.existsSync('/tmp/test3')===false); // eslint-disable-line no-sync

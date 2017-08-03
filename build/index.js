@@ -121,6 +121,25 @@ var Log = function () {
             return this;
         }
 
+        /** 
+         * submits obj for its properties to be logged in order found in this.header.
+         * if a property in this.header is omitted, the elsevalue is used.
+         * Extraneous properties in obj but not in this.header are ignored.
+         * @param {Object} obj object with properties from this.header and values to be logged
+         * @param {string} filler value to write for properties found in this.header but omitted from obj
+         */
+
+    }, {
+        key: 'submit',
+        value: function submit(obj, filler) {
+            if (!Array.isArray(this.header)) throw new Error("submit called, but this.header does not contain an array of properties to log");
+            var row = this.header.map(function (prop) {
+                var val = obj[prop];
+                return val === undefined ? filler : val;
+            });
+            this.write(row);
+        }
+
         /**
          * sets header row and writes it to Log for csv-style Log. 
          * @param {string[]} x Header array giving names of columns for future writes
