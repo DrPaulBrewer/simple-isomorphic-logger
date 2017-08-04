@@ -132,11 +132,15 @@ var Log = function () {
     }, {
         key: 'submit',
         value: function submit(obj, filler) {
-            if (!Array.isArray(this.header)) throw new Error("submit called, but this.header does not contain an array of properties to log");
-            var row = this.header.map(function (prop) {
-                var val = obj[prop];
-                return val === undefined ? filler : val;
-            });
+            var row = [],
+                header = this.header,
+                i = 0,
+                l = 0;
+            if (!Array.isArray(header)) throw new Error("submit called, but this.header does not contain an array of properties to log");
+            for (i = 0, l = header.length; i < l; ++i) {
+                var val = obj[header[i]];
+                row[i] = val === undefined ? filler : val;
+            }
             this.write(row);
         }
 

@@ -116,12 +116,13 @@ export default class Log {
      */
 
     submit(obj,filler){
-        if (!Array.isArray(this.header))
+        let row = [],header=this.header,i=0,l=0;
+        if (!Array.isArray(header))
             throw new Error("submit called, but this.header does not contain an array of properties to log");
-        const row = this.header.map(function(prop){
-            const val = obj[prop];
-            return (val===undefined)? filler: val;
-        });
+        for(i=0,l=header.length;i<l;++i){
+            const val = obj[header[i]];
+            row[i] = (val===undefined)? filler: val;
+        }
         this.write(row);
     }
 
