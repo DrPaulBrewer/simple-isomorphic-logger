@@ -30,7 +30,7 @@ describe('new Log() to data array', function(){
 describe('Log.write([1,2,3,4,5]) to data array ', function(){
 
     let L;
-    
+
     before(function(){
 	L = new Log();
 	L.data.length.should.equal(0);

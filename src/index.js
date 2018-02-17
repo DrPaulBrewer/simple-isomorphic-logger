@@ -144,7 +144,7 @@ export default class Log {
             this.write(x);
         }
         return this;
-    }
+   }
 
     /**
      * last value for some column recorded in Log 
