@@ -153,6 +153,10 @@ describe('Log.write then read back -- in filesystem ', function(){
     it('lastByKey("d") should be 9', function(){
         L.lastByKey("d").should.eql(9);
     });
+    it('lastByKey("unicorn") should throw (bad key)', function(){
+	function badKey(){ return L.lastByKey("unicorn"); }
+	badKey.should.throw();
+    });
  
 });
 
@@ -198,7 +202,10 @@ describe('Log.write 1,2,3,4,5 and submit object with values 6,7,8,9,10 then read
     it('lastByKey("d") should be 9', function(){
         L.lastByKey("d").should.eql(9);
     });
- 
+        it('lastByKey("unicorn") should throw (bad key)', function(){
+	function badKey(){ return L.lastByKey("unicorn"); }
+	badKey.should.throw();
+    });
 });
 
 function cleanup(){

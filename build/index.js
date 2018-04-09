@@ -167,16 +167,19 @@ var Log = function () {
         }
 
         /**
-         * last value for some column recorded in Log 
+         * last value for some column recorded in Log
+         * throws if log is missing header row or column key is undefined
          * @return {number|string|undefined} value from last write at column position matching header for given key
          */
 
     }, {
         key: 'lastByKey',
         value: function lastByKey(k) {
-            if (this.header && this.header.length && this.last && this.last.length) {
-                return this.last[this.header.indexOf(k)];
-            }
+            if (!this.header || !this.header.length) throw new Error("log is missing header row");
+            var idx = this.header.indexOf(k);
+            if (idx === -1) throw new Error("bad column key: " + k);
+            if (!this.last || !this.last.length) return undefined;
+            return this.last[this.header.indexOf(k)];
         }
 
         /**
