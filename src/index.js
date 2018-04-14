@@ -1,5 +1,5 @@
-// Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC                             
-// This is open source software. The MIT License applies to this software.                                  
+// Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC
+// This is open source software. The MIT License applies to this software.
 // see https://opensource.org/licenses/MIT or included License.md file
 
 /* eslint no-sync:"off", no-underscore-dangle:"off" */
@@ -18,7 +18,7 @@
 
 export default class Log {
 
-    /** 
+    /**
      * Create Log with suggested file name in browser memory or on-disk in nodejs
      *
      * @param {string} fname Suggested file name
@@ -31,7 +31,7 @@ export default class Log {
          * if true, uses nodejs fs calls
          * @type {boolean} this.useFS
          */
-        
+
         this.useFS = false;
         try {
             if (typeof(force)==='undefined'){
@@ -46,7 +46,7 @@ export default class Log {
         } catch(e){} // eslint-disable-line no-empty
 
         if (this.useFS){
-                
+
             /**
              * log file descriptor from open call
              * @type {number} this.fd
@@ -54,14 +54,14 @@ export default class Log {
 
             this.fname = fname;
             this.fd = fs.openSync(fname, 'w');
-            
+
         } else {
-            
-            /** 
+
+            /**
              * data array for browser and test usage
              * @type {Array} this.data
              */
-            
+
             this.data = [];
         }
     }
@@ -96,7 +96,7 @@ export default class Log {
          * last item written to log
          * @type {Object} this.last
          */
-        
+
         this.last = x;
 
         if (this.useFS){
@@ -107,7 +107,7 @@ export default class Log {
         return this;
     }
 
-    /** 
+    /**
      * submits obj for its properties to be logged in order found in this.header.
      * if a property in this.header is omitted, the elsevalue is used.
      * Extraneous properties in obj but not in this.header are ignored.
@@ -127,12 +127,12 @@ export default class Log {
     }
 
     /**
-     * sets header row and writes it to Log for csv-style Log. 
+     * sets header row and writes it to Log for csv-style Log.
      * @param {string[]} x Header array giving names of columns for future writes
      * @return {Object} Returns this Log; chainable
      */
 
-   setHeader(x){ 
+   setHeader(x){
         if (Array.isArray(x)){
 
             /**
@@ -140,7 +140,7 @@ export default class Log {
              * @type {string[]}
              */
 
-            this.header = x;            
+            this.header = x;
             this.write(x);
         }
         return this;
@@ -151,7 +151,7 @@ export default class Log {
      * throws if log is missing header row or column key is undefined
      * @return {number|string|undefined} value from last write at column position matching header for given key
      */
-    
+
     lastByKey(k){
         if (!this.header || !this.header.length)
             throw new Error("log is missing header row");
@@ -160,11 +160,11 @@ export default class Log {
             throw new Error("bad column key: "+k);
         if (!this.last || !this.last.length)
             return undefined;
-        return this.last[this.header.indexOf(k)];
+        return this.last[idx];
     }
 
     /**
-     * get string of all data in the log.  If useFS is true, simply read the file.  If useFS is false, assemble from data. 
+     * get string of all data in the log.  If useFS is true, simply read the file.  If useFS is false, assemble from data.
      *
      * @return string representing all log data
      *
@@ -183,11 +183,11 @@ export default class Log {
     }
 
     /**
-     * restore Log from string.  inverse of toString(). 
+     * restore Log from string.  inverse of toString().
      *
      * @param string to convert to complete Log
      */
-    
+
     fromString(s){
         function rowFromLine(line){
             const row = line.split(",");
@@ -209,7 +209,7 @@ export default class Log {
                 throw new Error("forbidden: attempting fromString() on populated Log -- denied -- would cause data erasure");
             this.data.length = 0;
         }
-        
+
         if (this.header){
             this.setHeader(first.split(","));
             start = first.length+1;
@@ -243,7 +243,7 @@ export default class Log {
         if (this.useFS) {
             fs.fsyncSync(this.fd);
             return fs.createReadStream(this.fname,{encoding: 'utf8'});
-        } 
+        }
         if (!Readable) throw new Error("missing base class for Readable stream as first parameter");
         class LogStream extends Readable {
             constructor(simlog, opt) {
@@ -260,13 +260,12 @@ export default class Log {
                         const str = this._log.stringify(this._log.data[i]);
                         if ((typeof(str)==='string') && (str.length>0))
                             hungry = this.push(str, 'utf8');
-                    } else { 
+                    } else {
                         hungry = this.push(null);
                     }
                 } while ((i<this._max) && hungry);
             }
         }
-        return new LogStream(this);    
+        return new LogStream(this);
     }
 }
-

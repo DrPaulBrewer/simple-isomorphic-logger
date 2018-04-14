@@ -14,8 +14,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-// Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC                             
-// This is open source software. The MIT License applies to this software.                                  
+// Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC
+// This is open source software. The MIT License applies to this software.
 // see https://opensource.org/licenses/MIT or included License.md file
 
 /* eslint no-sync:"off", no-underscore-dangle:"off" */
@@ -33,7 +33,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Log = function () {
 
-    /** 
+    /**
      * Create Log with suggested file name in browser memory or on-disk in nodejs
      *
      * @param {string} fname Suggested file name
@@ -68,7 +68,7 @@ var Log = function () {
             this.fd = fs.openSync(fname, 'w');
         } else {
 
-            /** 
+            /**
              * data array for browser and test usage
              * @type {Array} this.data
              */
@@ -121,7 +121,7 @@ var Log = function () {
             return this;
         }
 
-        /** 
+        /**
          * submits obj for its properties to be logged in order found in this.header.
          * if a property in this.header is omitted, the elsevalue is used.
          * Extraneous properties in obj but not in this.header are ignored.
@@ -145,7 +145,7 @@ var Log = function () {
         }
 
         /**
-         * sets header row and writes it to Log for csv-style Log. 
+         * sets header row and writes it to Log for csv-style Log.
          * @param {string[]} x Header array giving names of columns for future writes
          * @return {Object} Returns this Log; chainable
          */
@@ -179,11 +179,11 @@ var Log = function () {
             var idx = this.header.indexOf(k);
             if (idx === -1) throw new Error("bad column key: " + k);
             if (!this.last || !this.last.length) return undefined;
-            return this.last[this.header.indexOf(k)];
+            return this.last[idx];
         }
 
         /**
-         * get string of all data in the log.  If useFS is true, simply read the file.  If useFS is false, assemble from data. 
+         * get string of all data in the log.  If useFS is true, simply read the file.  If useFS is false, assemble from data.
          *
          * @return string representing all log data
          *
@@ -205,7 +205,7 @@ var Log = function () {
         }
 
         /**
-         * restore Log from string.  inverse of toString(). 
+         * restore Log from string.  inverse of toString().
          *
          * @param string to convert to complete Log
          */
