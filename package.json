@@ -1,6 +1,6 @@
 {
   "name": "simple-isomorphic-logger",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Flexibly log data to an in-memory browser array or to stream with writeSync to a .csv file on nodeJS",
   "main": "build/index.js",
   "scripts": {
