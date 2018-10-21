@@ -3,7 +3,7 @@
 /* eslint no-console: "off", newline-per-chained-call: "off", no-sync: "off" */
 
 import assert from 'assert';
-import 'should';
+import Should from 'should'; // eslint-disable-line no-unused-vars
 import Log from '../src/index.js';
 import Readable from 'readable-stream';
 import concat from 'concat-stream';
