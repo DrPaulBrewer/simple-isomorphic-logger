@@ -193,7 +193,7 @@ export default class Log {
             const row = line.split(",");
             for(let i=0,rl=row.length;i<rl;++i){
                 let v = row[i];
-                if ((v) && (/^-?\d/.test(v))){
+                if ((v) && ((/^-?\d/).test(v))){
                     v = parseFloat(v);
                     if (!isNaN(v))
                         row[i] = v;
