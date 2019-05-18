@@ -27,12 +27,12 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/register": "^7.0.0",
     "concat-stream": "^2.0.0",
-    "coveralls": "^3.0.0",
+    "coveralls": "^3.0.3",
     "esdoc": "^1.1.0",
     "eslint": "^5.14.1",
     "mocha": "^6.0.0",
     "nyc": "^14.1.1",
-    "readable-stream": "^3.1.1",
+    "readable-stream": "^3.3.0",
     "should": "^13.1.2"
   },
   "directories": {
