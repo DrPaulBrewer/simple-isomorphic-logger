@@ -2,6 +2,7 @@
 
 /* eslint no-console: "off", newline-per-chained-call: "off", no-sync: "off" */
 
+import "@babel/polyfill";
 import assert from 'assert';
 import Should from 'should'; // eslint-disable-line no-unused-vars
 import Log from '../src/index.js';
