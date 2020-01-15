@@ -5,6 +5,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _findZeroRange3 = _interopRequireDefault(require("find-zero-range"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
 
 function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
@@ -23,22 +35,6 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-// Copyright 2016 Paul Brewer, Economic and Financial Technology Consulting LLC
-// This is open source software. The MIT License applies to this software.
-// see https://opensource.org/licenses/MIT or included License.md file
-
-/* eslint no-sync:"off", no-underscore-dangle:"off" */
-
-/* global fs */
-
-/**
- * Isomorphic javascript logger, logs data rows to memory for browser and test simulations, logs data rows to .csv disk files for node server-based simulations
- */
-
-/**
- * Log stores tabular (array-of-array) data in JS memory on the browser, but streams it to disk using fs.appendFileSync() in nodejs server apps.
- * .last is used to cache the last log row As a kind of limited guarantee of history on both platforms
- */
 var Log =
 /*#__PURE__*/
 function () {
@@ -110,11 +106,17 @@ function () {
   }, {
     key: "write",
     value: function write(x) {
-      if (x === undefined) return;
+      if (x === undefined) throw new Error("simple-isomorphic-logger.write undefined x data");
+      if (!Array.isArray(x)) throw new Error("simple-isomorphic-logger.write non-array x data");
+
+      if (!Object.isFrozen(x)) {
+        Object.freeze(x);
+      }
       /**
        * last item written to log
        * @type {Object} this.last
        */
+
 
       this.last = x;
 
@@ -128,7 +130,7 @@ function () {
     }
     /**
      * submits obj for its properties to be logged in order found in this.header.
-     * if a property in this.header is omitted, the elsevalue is used.
+     * if a property in this.header is omitted, the filler value is used.
      * Extraneous properties in obj but not in this.header are ignored.
      * @param {Object} obj object with properties from this.header and values to be logged
      * @param {string} filler value to write for properties found in this.header but omitted from obj
@@ -322,6 +324,54 @@ function () {
       }(Readable);
 
       return new LogStream(this);
+    }
+    /**
+     * find subset of in-memory data satisfying fromValue<=prop_value<=toValue
+     * requires strictly non-decreasing column.  uses bisection.
+     * @param {String} prop property, a column name defined in header
+     * @param {Number} fromValue the lowest value of prop to include in the returned Array
+     * @param {Number} toValue (defaults to fromValue if omitted) the highest value of prop to include
+     * @return {Array[Array[]]} returned subset of data rows
+    */
+
+  }, {
+    key: "selectAscending",
+    value: function selectAscending(prop, fromValue) {
+      var toValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : fromValue;
+      var data = this.data;
+      if (typeof prop !== 'string') throw new Error("simple-isomorphic-logger: selectAscending requires string prop");
+      if (typeof fromValue !== 'number') throw new Error("simple-isomorphic-logger: selectAscending requires numeric fromValue");
+      if (typeof toValue !== 'number') throw new Error("simple-isomorphic-logger: selectAscending requires numeric toValue");
+      if (toValue < fromValue) throw new Error("simple-isomorphic-logger: selectAscending requires toValue>=fromValue");
+      if (!this.header) throw new Error("simple-isomorphic-logger: selectAscending requires header=True");
+      if (this.useFS) throw new Error("simple-isomorphic-logger: selectAscending requires useFS=false");
+      var propCol = this.header.indexOf(prop);
+      if (propCol === -1) throw new Error("simple-isomorphic-logger: selectAscending prop not found in header");
+
+      var _findZeroRange = (0, _findZeroRange3["default"])(1, data.length - 1, 1, function (row) {
+        var v = data[row][propCol];
+        if (v < fromValue) return -1;
+        if (v > toValue) return 1;
+        return 0;
+      }),
+          _findZeroRange2 = _slicedToArray(_findZeroRange, 2),
+          firstRow = _findZeroRange2[0],
+          lastRow = _findZeroRange2[1];
+
+      if (firstRow) {
+        if (lastRow === undefined) {
+          // treat as firstRow === lastRow
+          var vcheck = data[firstRow][propCol];
+          if (vcheck < fromValue || vcheck > toValue) return [];
+          return [this.header.slice(), data[firstRow]];
+        }
+
+        var result = data.slice(firstRow, lastRow + 1);
+        result.unshift(this.header.slice());
+        return result;
+      }
+
+      return [];
     }
   }]);
 
