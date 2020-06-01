@@ -1,7 +1,7 @@
 simple-isomorphic-logger
 ========
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/DrPaulBrewer/simple-isomorphic-logger.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/DrPaulBrewer/simple-isomorphic-logger.svg?branch=master)](https://travis-ci.org/DrPaulBrewer/simple-isomorphic-logger)
 [![Coverage Status](https://coveralls.io/repos/github/DrPaulBrewer/simple-isomorphic-logger/badge.svg?branch=master)](https://coveralls.io/github/DrPaulBrewer/simple-isomorphic-logger?branch=master)
 
