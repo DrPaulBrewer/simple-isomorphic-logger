@@ -199,21 +199,6 @@ class Log {
 
 
   fromString(s) {
-    function rowFromLine(line) {
-      const row = line.split(",");
-
-      for (let i = 0, rl = row.length; i < rl; ++i) {
-        let v = row[i];
-
-        if (v && /^-?\d/.test(v)) {
-          v = parseFloat(v);
-          if (!isNaN(v)) row[i] = v;
-        }
-      }
-
-      return row;
-    }
-
     const first = s.substring(0, s.indexOf("\n"));
     let start = 0;
 
@@ -239,7 +224,17 @@ class Log {
         const obj = JSON.parse(line);
         this.write(obj);
       } else if (line.includes(",")) {
-        this.write(rowFromLine(line));
+        const row = line.split(",");
+
+        for (let i = 0, rl = row.length; i < rl; ++i) {
+          const n = parseFloat(row[i]);
+
+          if (!Number.isNaN(n)) {
+            row[i] = n;
+          }
+        }
+
+        this.write(row);
       } else this.write(line);
     }
 
@@ -299,8 +294,7 @@ class Log {
   */
 
 
-  selectAscending(prop, fromValue) {
-    let toValue = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : fromValue;
+  selectAscending(prop, fromValue, toValue = fromValue) {
     const data = this.data;
     if (typeof prop !== 'string') throw new Error("simple-isomorphic-logger: selectAscending requires string prop");
     if (typeof fromValue !== 'number') throw new Error("simple-isomorphic-logger: selectAscending requires numeric fromValue");
