@@ -197,18 +197,6 @@ export default class Log {
    */
 
   fromString(s) {
-    function rowFromLine(line) {
-      const row = line.split(",");
-      for (let i = 0, rl = row.length;i < rl;++i) {
-        let v = row[i];
-        if ((v) && ((/^-?\d/).test(v))) {
-          v = parseFloat(v);
-          if (!isNaN(v))
-            row[i] = v;
-        }
-      }
-      return row;
-    }
     const first = s.substring(0, s.indexOf("\n"));
     let start = 0;
 
@@ -234,7 +222,14 @@ export default class Log {
         const obj = JSON.parse(line);
         this.write(obj);
       } else if (line.includes(",")) {
-        this.write(rowFromLine(line));
+        const row = line.split(",");
+        for (let i = 0, rl = row.length;i < rl;++i) {
+          const n = parseFloat(row[i]);
+          if (!Number.isNaN(n)){
+            row[i] = n;
+          }
+        }
+        this.write(row);
       } else
         this.write(line);
     }
