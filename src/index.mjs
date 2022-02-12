@@ -4,8 +4,6 @@
 
 /* eslint no-sync:"off", no-underscore-dangle:"off" */
 
-/* global fs */
-
 /**
  * Isomorphic javascript logger, logs data rows to memory for browser and test simulations, logs data rows to .csv disk files for node server-based simulations
  */
@@ -17,36 +15,25 @@
 
 import findZeroRange from 'find-zero-range';
 
-export default class Log {
+export class Log {
 
   /**
    * Create Log with suggested file name in browser memory or on-disk in nodejs
    *
-   * @param {string} fname Suggested file name
-   * @param {boolean} force true forces filesystem mode, false forces memory mode, undefined tests for 'fs' module
+   * @param {string} [fname] Suggested file name
+   * @param {object} [fs] pass the node builtin 'fs' module to use filesystem
    */
 
-  constructor(fname, force) {
+  constructor(fname, fs) {
 
-    /**
-     * if true, uses nodejs fs calls
-     * @type {boolean} this.useFS
-     */
-
-    this.useFS = false;
-    try {
-      if (typeof(force) === 'undefined') {
-        this.useFS = ((typeof(fname) === 'string') &&
+    if    ((typeof(fname) === 'string') &&
           (typeof(fs) === 'object') &&
           (typeof(fs.openSync) === 'function') &&
-          (typeof(fs.appendFileSync) === 'function') &&
-          !(fs.should));
-      } else {
-        this.useFS = force;
-      }
-    } catch (e) {} // eslint-disable-line no-empty
+          (typeof(fs.appendFileSync) === 'function')){
+            this.fs = fs;
+    }
 
-    if (this.useFS) {
+    if (this.fs) {
 
       /**
        * log file descriptor from open call
@@ -104,8 +91,8 @@ export default class Log {
 
     this.last = x;
 
-    if (this.useFS) {
-      fs.appendFileSync(this.fd, this.stringify(x));
+    if (this.fs) {
+      this.fs.appendFileSync(this.fd, this.stringify(x));
     } else {
       this.data.push(x);
     }
@@ -179,8 +166,8 @@ export default class Log {
    */
 
   toString() {
-    if (this.useFS) {
-      return fs.readFileSync(this.fname, { encoding: 'utf8' });
+    if (this.fs) {
+      return this.fs.readFileSync(this.fname, { encoding: 'utf8' });
     }
     let s = '';
     let i, l;
@@ -243,9 +230,9 @@ export default class Log {
    */
 
   createReadStream(Readable) {
-    if (this.useFS) {
-      fs.fsyncSync(this.fd);
-      return fs.createReadStream(this.fname, { encoding: 'utf8' });
+    if (this.fs) {
+      this.fs.fsyncSync(this.fd);
+      return this.fs.createReadStream(this.fname, { encoding: 'utf8' });
     }
     if (!Readable) throw new Error("missing base class for Readable stream as first parameter");
     class LogStream extends Readable {
@@ -288,7 +275,7 @@ export default class Log {
     if (typeof(toValue)!=='number') throw new Error("simple-isomorphic-logger: selectAscending requires numeric toValue");
     if (toValue<fromValue) throw new Error("simple-isomorphic-logger: selectAscending requires toValue>=fromValue");
     if (!this.header) throw new Error("simple-isomorphic-logger: selectAscending requires header=True");
-    if (this.useFS) throw new Error("simple-isomorphic-logger: selectAscending requires useFS=false");
+    if (this.fs) throw new Error("simple-isomorphic-logger: selectAscending requires useFS=false");
     const propCol = this.header.indexOf(prop);
     if (propCol === -1) throw new Error("simple-isomorphic-logger: selectAscending prop not found in header");
     const [firstRow, lastRow] = findZeroRange(

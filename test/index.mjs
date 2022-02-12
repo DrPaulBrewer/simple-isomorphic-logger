@@ -2,12 +2,12 @@
 
 /* eslint no-console: "off", newline-per-chained-call: "off", no-sync: "off" */
 
-import "@babel/polyfill";
+import {Log} from '../src/index.mjs';
 import assert from 'assert';
 import Should from 'should'; // eslint-disable-line no-unused-vars
-import Log from '../src/index.js';
 import Readable from 'readable-stream';
 import concat from 'concat-stream';
+import fs from 'fs';
 
 describe('new Log() to data array', function () {
 
@@ -224,30 +224,27 @@ describe('selectAscending', function(){
 
 describe('new Log() to file', function () {
 
-  global.fs = require('fs'); // eslint-disable-line global-require
-
-  it('should have an empty data array', function () {
-    let L = new Log("/tmp/test1", true);
+  it('should not have a data array', function () {
+    let L = new Log("/tmp/test1", fs);
     L.should.not.have.property('data');
   });
-  it('should have .useFS true', function () {
-    let L = new Log("/tmp/test1", true);
-    assert.ok(L.useFS);
+  it('should define .fs', function () {
+    let L = new Log("/tmp/test1", fs);
+    assert.ok(L.fs===fs);
   });
   it('should have .fd defined', function () {
-    let L = new Log("/tmp/test1", true);
+    let L = new Log("/tmp/test1", fs);
     assert.ok(typeof(L.fd) === 'number');
   });
 });
 
 describe('Log.write then read back -- in filesystem ', function () {
-  global.fs = require('fs'); // eslint-disable-line global-require
-  let L = new Log("/tmp/test2", true);
+  let L = new Log("/tmp/test2", fs);
   L.setHeader(["a", "b", "c", "d", "e"]);
   L.write([1, 2, 3, 4, 5]);
   L.write([6, 7, 8, 9, 10]);
   it('/tmp/test2 should contain a,b,c,d,e  1,2,3,4,5  6,7,8,9,10  separated by newlines ', function () {
-    const out = global.fs.readFileSync("/tmp/test2", { encoding: "utf-8" }); // eslint-disable-line no-sync
+    const out = fs.readFileSync("/tmp/test2", { encoding: "utf-8" }); // eslint-disable-line no-sync
     out.should.eql("a,b,c,d,e\n1,2,3,4,5\n6,7,8,9,10\n");
   });
   it('toString() should contain same', function () {
@@ -284,7 +281,7 @@ describe('Log.write then read back -- in filesystem ', function () {
 });
 
 describe('Log.write 1,2,3,4,5 and submit object with values 6,7,8,9,10 then read back -- in memory ', function () {
-  let L = new Log("/tmp/test3", false);
+  let L = new Log("/tmp/test3");
   L.setHeader(["a", "b", "c", "d", "e"]);
   L.write([1, 2, 3, 4, 5]);
   const obj = {
@@ -296,7 +293,6 @@ describe('Log.write 1,2,3,4,5 and submit object with values 6,7,8,9,10 then read
   };
   L.submit(obj);
   it('/tmp/test3 shoud not exist', function () {
-    const fs = require('fs'); // eslint-disable-line global-require
     assert.ok(fs.existsSync('/tmp/test3') === false); // eslint-disable-line no-sync
   });
   it('toString() should contain expected output', function () {
@@ -332,7 +328,6 @@ describe('Log.write 1,2,3,4,5 and submit object with values 6,7,8,9,10 then read
 });
 
 function cleanup() {
-  const fs = require('fs'); // eslint-disable-line global-require
   [1, 2].forEach((n) => { try { fs.unlinkSync("/tmp/test" + n); } catch (e) { console.log(e); } });
 }
 
