@@ -2,7 +2,7 @@
   "name": "simple-isomorphic-logger",
   "version": "5.0.0",
   "description": "Flexibly log data to an in-memory browser array or to stream with writeSync to a .csv file on nodeJS",
-  "exports": "src/index.mjs",
+  "exports": "./src/index.mjs",
   "scripts": {
     "doc": "esdoc -c esdoc.json",
     "lint": "eslint src/index.mjs",
